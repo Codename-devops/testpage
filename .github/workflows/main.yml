@@ -1,0 +1,41 @@
+name: Deploy to EKS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_push_to_ecr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URL }}
+
+      - name: Build the Docker image
+        run: |
+          docker build -t meine-website $GITHUB_WORKSPACE
+          docker tag meine-website:latest ${{ secrets.ECR_REPOSITORY_URL }}:latest
+
+      - name: Push the Docker image to ECR
+        run: |
+          docker push ${{ secrets.ECR_REPOSITORY_URL }}:latest
+
+  deploy_to_eks:
+    needs: build_and_push_to_ecr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Configure kubectl
+        run: |
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name deine-cluster-name
+
+      - name: Update Kubernetes deployment
+        run: |
+          kubectl set image deployment/meine-website meine-website-container=${{ secrets.ECR_REPOSITORY_URL }}:latest

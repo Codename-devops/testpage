@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meine-website
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: meine-website
+  template:
+    metadata:
+      labels:
+        app: meine-website
+    spec:
+      containers:
+        - name: meine-website-container
+          image: dein-docker-image:latest # Hier wird das Image-Tag später durch GitHub Actions aktualisiert
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: meine-website-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: meine-website
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
