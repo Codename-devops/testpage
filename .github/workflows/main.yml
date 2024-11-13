@@ -47,5 +47,5 @@ jobs:
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          aws eks --region $AWS_REGION update-kubeconfig --name deine-cluster-name
+          aws eks --region $AWS_REGION update-kubeconfig --name devops-testpage
           kubectl set image deployment/meine-website meine-website-container=${{ secrets.ECR_REPOSITORY_URL }}:latest
