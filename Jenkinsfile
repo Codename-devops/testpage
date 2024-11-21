@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'file:///home/user/projects/website'
+                git branch: 'main', url: 'https://github.com/Codename-devops/testpage.git
             }
         }
         stage('Build') {
